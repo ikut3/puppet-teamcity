@@ -6,7 +6,7 @@ class teamcity::db(
   $host                 = 'localhost',
   $port                 = 5432,
   $db_name              = 'teamcity_server',
-  $mysql_connector      = 'mysql-connector-java-5.1.33',
+  $mysql_connector      = 'mysql-connector-java-5.1.38',
   $postgresql_connector = 'postgresql-9.3-1103.jdbc41.jar'
 ){
   $db_file = "${teamcity::server::data_dir}/config/database.properties"
