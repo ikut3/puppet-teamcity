@@ -16,12 +16,12 @@
 #
 # == Example
 #
-#    class { 'teamcity::server::plugin':
+#    teamcity::server::plugins { 'node':
 #      plugin_url       => 'http://teamcity.jetbrains.com/guestAuth/repository/download/bt434/.lastSuccessful/jonnyzzz.node.zip',
 #      plugin_zip_file  => 'jonnyzzz.node.zip',
 #      wget_opts        => "-e use_proxy=yes -e http_proxy=http://mycompanyproxy.com:3128",
 #      require          => Class['teamcity::server'],
-#   }
+#    }
 #
 #
 define teamcity::server::plugin (
@@ -35,22 +35,22 @@ define teamcity::server::plugin (
   validate_re($ensure, ['^absent$', '^present$'], "Invalid ensure: ${ensure} - (Must be 'present' or 'absent')")
 
   if $ensure == 'present' {
-    exec { 'download teamcity plugin':
+    exec { "download teamcity plugin ${plugin_url}":
       command => "wget ${wget_opts} \"${plugin_url}\"",
       creates => "${teamcity::server::plugin_dir}/${plugin_zip_file}",
       cwd     => $teamcity::server::plugin_dir,
-      notify  => Exec['restart teamcity service'],
+      notify  => Exec["restart teamcity service to add ${plugin_zip_file}"],
       timeout => 0
     }
   
-    exec { 'set ownership teamcity plugin':
+    exec { "set ownership teamcity plugin ${plugin_zip_file}":
       command => "chown ${teamcity::server::user}:${teamcity::common::group} \"${teamcity::server::plugin_dir}/${plugin_zip_file}\"",
       cwd     => $teamcity::server::plugin_dir,
-      require => Exec['download teamcity plugin'],
+      require => Exec["download teamcity plugin ${plugin_url}"],
       timeout => 0
     }
   
-    exec { 'restart teamcity service':
+    exec { "restart teamcity service to add ${plugin_zip_file}":
       command     => "service ${teamcity::server::service} restart",
       cwd         => $teamcity::server::home_dir,
       refreshonly => true,
@@ -61,9 +61,10 @@ define teamcity::server::plugin (
     file { "${teamcity::server::plugin_dir}/${plugin_zip_file}":
       ensure  => absent,
       backup  => false,
+      notify  => Exec["restart teamcity service to remove plugin ${plugin_zip_file}"],
     }
     
-    exec { 'restart teamcity service to remove plugin':
+    exec { "restart teamcity service to remove plugin ${plugin_zip_file}":
       command     => "service ${teamcity::server::service} restart",
       cwd         => $teamcity::server::home_dir,
       refreshonly => true,
