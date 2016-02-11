@@ -15,7 +15,7 @@ Tested on CentOS 6.x.
     require => Class['oraclejava::jdk7_rpm'],
  }
 
- class { 'teamcity::server::plugin':
+ teamcity::server::plugin { 'node':
     plugin_url       => 'http://teamcity.jetbrains.com/guestAuth/repository/download/bt434/.lastSuccessful/jonnyzzz.node.zip',
     plugin_zip_file  => 'jonnyzzz.node.zip',
     require          => Class['teamcity::server'],
@@ -77,7 +77,7 @@ Install via an http proxy and configure port, directories etc
     require           => Class['oraclejava::jdk7_rpm'],
  }
  
- class { 'teamcity::server::plugin':
+ teamcity::server::plugin { 'node':
     plugin_url       => 'https://teamcity.jetbrains.com/guestAuth/repository/download/bt434/.lastSuccessful/jonnyzzz.node.zip',
     plugin_zip_file  => 'jonnyzzz.node.zip',
     wget_opts        => "-e use_proxy=yes -e http_proxy=10.99.99.99:3128 -e https_proxy=10.99.99.99:3128",
